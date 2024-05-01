@@ -1,21 +1,11 @@
 @echo off
-cls
-echo Checking permissions... (Flair must be started as administrator)
-
-:: Elevation
-net file 1>NUL 2>NUL
-if not '%errorlevel%' == '0' (
-    powershell Start-Process -FilePath "%0" -ArgumentList "%cd%" -verb runas >NUL 2>&1
-    exit /b
-)
-
 :MENU
 cls
-echo -----------------------------------------------------------
+echo -----------------------------------------------------------------
 echo Welcome to Flair, your all in one Flow Administrative Tool.
-echo Version 1.0
-echo Please select an action.
-echo -----------------------------------------------------------
+echo Version 1.0.3
+echo Make sure Flair is running as an administrator! Select an action.
+echo -----------------------------------------------------------------
 echo 1) Patch Accounts
 echo 2) Remove Spyware (Experimental)
 echo 3) Install Windows Sandbox
@@ -88,6 +78,12 @@ if errorlevel==1 goto ping
 echo Connected!
 echo Installing Sandbox...
 dism /online /NoRestart /Enable-Feature /FeatureName:"Containers-DisposableClientVM" -All
+echo Cleaning Up...
+del "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Sandbox.lnk"
+xcopy "%~dp0\Sandbox.wsb" "C:\Windows\Sandbox.wsb*" /y
+xcopy "%~dp0\Windows Sandbox.lnk" "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Sandbox.lnk*" /y
+xcopy "%~dp0\SandboxPlus.wsb" "C:\Windows\SandboxPlus.wsb*" /y
+xcopy "%~dp0\Windows Sandbox Plus.lnk" "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Sandbox Plus.lnk*" /y
 echo Windows Sandbox installed successfully.
 timeout /t -1
 GOTO MENU
@@ -165,6 +161,7 @@ GOTO MENU
 :7 
 cls
 echo Patching Microsoft Store...
+taskkill /f /im WinStore.App.exe
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsStore" /v "RemoveWindowsStore" /t REG_DWORD /d 0 /f
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsStore" /v "RequirePrivateStore" /t REG_DWORD /d 0 /f
 reg add "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\WindowsStore" /v "RemoveWindowsStore" /t REG_DWORD /d 0 /f
@@ -176,14 +173,13 @@ GOTO MENU
 :8
 cls
 echo Installing All Patches...
+taskkill /f /im WinStore.App.exe
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsStore" /v "RemoveWindowsStore" /t REG_DWORD /d 0 /f
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsStore" /v "RequirePrivateStore" /t REG_DWORD /d 0 /f
 reg add "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\WindowsStore" /v "RemoveWindowsStore" /t REG_DWORD /d 0 /f
 reg add "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\WindowsStore" /v "RequirePrivateStore" /t REG_DWORD /d 0 /f
-taskkill /f /im explorer.exe
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Policies\System" /v "DisableTaskMgr" /t REG_DWORD /d 0 /f
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Policies\System" /v "HideFastUserSwitching" /t REG_DWORD /d 0 /f
-explorer.exe
 taskkill /f /im msedge.exe
 rd /s /q "C:\Users\%username%\AppData\Local\Microsoft\Edge\User Data"
 reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge" /v "DeveloperToolsAvailability" /t REG_DWORD /d 1 /f
@@ -221,6 +217,11 @@ set target=www.google.com
 ping %target% -n 1 | find "Reply"
 if errorlevel==1 goto ping
 dism /online /NoRestart /Enable-Feature /FeatureName:"Containers-DisposableClientVM" -All
+del "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Sandbox.lnk"
+xcopy "%~dp0\Sandbox.wsb" "C:\Windows\Sandbox.wsb*" /y
+xcopy "%~dp0\Windows Sandbox.lnk" "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Sandbox.lnk*" /y
+xcopy "%~dp0\SandboxPlus.wsb" "C:\Windows\SandboxPlus.wsb*" /y
+xcopy "%~dp0\Windows Sandbox Plus.lnk" "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows Sandbox Plus.lnk*" /y
 echo All patches (excluding flowd installation) have been performed, please restart to apply changes.
 timeout /t -1
 GOTO MENU
@@ -242,7 +243,7 @@ goto :QUIT
 cls
 echo Restarting now...
 shutdown /r /t 0
-timeout /t 5
+timeout /t -1
 exit
 
 :no

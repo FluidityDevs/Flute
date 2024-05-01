@@ -1,0 +1,15 @@
+<Configuration>
+<vGPU>Enable</vGPU>
+<VideoInput>Enable</VideoInput>
+<MemoryInMB>8192</MemoryInMB>
+<MappedFolders>
+<MappedFolder>
+<HostFolder>D:\</HostFolder>
+<SandboxFolder>C:\Users\WDAGUtilityAccount\Desktop\External</SandboxFolder>
+</MappedFolder>
+<MappedFolder>
+<HostFolder>C:\Users</HostFolder>
+<SandboxFolder>C:\Users\WDAGUtilityAccount\Desktop\Host Users</SandboxFolder>
+</MappedFolder>
+</MappedFolders>
+</Configuration>
